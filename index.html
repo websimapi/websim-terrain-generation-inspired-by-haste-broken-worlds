@@ -32,7 +32,7 @@
             </select>
         </div>
         <div class="info-panel">
-            <h2>Terrain Generation</h2>
+            <h2>Terrain Generation <span id="fps-counter">0</span> FPS</h2>
             <div class="stat">
                 <label>Chunks Loaded:</label>
                 <span id="chunks-loaded">0</span>
@@ -46,6 +46,13 @@
                 <p>None</p>
             </div>
         </div>
+    </div>
+    
+    <div class="minimap" id="minimap"></div>
+    
+    <div class="performance-metrics">
+        <div>Vertex Count: <span id="vertex-count">0</span></div>
+        <div>Triangle Count: <span id="triangle-count">0</span></div>
     </div>
     
     <div class="credits">
