@@ -13,9 +13,7 @@ const WORLD_SEED = Math.random() * 1000;
 // Main class
 class TerrainGenerator {
     constructor() {
-        this.setupScene();
-        this.setupNoise();
-        this.setupUI();
+        // Initialize properties first
         this.chunks = new Map();
         this.chunkCache = new Map(); // Cache for previously generated chunks
         this.currentBiome = biomeTypes.grassland;
@@ -34,6 +32,11 @@ class TerrainGenerator {
         this.frameCount = 0;
         this.lastTime = performance.now();
         this.highlightedFeature = null;
+        
+        // Now set up everything else
+        this.setupNoise();
+        this.setupScene();
+        this.setupUI();
         
         // Set up keyboard controls
         this.setupControls();
@@ -82,7 +85,7 @@ class TerrainGenerator {
         this.hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0x444444, 0.5);
         this.scene.add(this.hemisphereLight);
         
-        // Add skybox
+        // Add skybox - moved after currentBiome is initialized
         this.updateSkybox();
         
         // Add controls
@@ -102,6 +105,18 @@ class TerrainGenerator {
         });
     }
     
+    updateSkybox() {
+        if (!this.currentBiome || !this.scene) return; // Guard clause to prevent errors
+        
+        // Set the scene background and fog color based on biome
+        const skyColor = new THREE.Color(this.currentBiome.skyColor || 0x87ceeb);
+        this.scene.background = skyColor;
+        if (this.scene.fog) {
+            this.scene.fog.color = skyColor;
+            this.scene.fog.density = this.currentBiome.fogDensity || 0.002;
+        }
+    }
+    
     setupNoise() {
         this.noise2D = createNoise2D();
         this.noise3D = createNoise3D();
@@ -109,20 +124,28 @@ class TerrainGenerator {
     }
     
     setupUI() {
-        document.getElementById('toggle-generation').addEventListener('click', () => {
-            this.isPaused = !this.isPaused;
-            document.getElementById('toggle-generation').textContent = 
-                this.isPaused ? 'Resume Generation' : 'Pause Generation';
-        });
+        const toggleBtn = document.getElementById('toggle-generation');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                this.isPaused = !this.isPaused;
+                toggleBtn.textContent = this.isPaused ? 'Resume Generation' : 'Pause Generation';
+            });
+        }
         
-        document.getElementById('biome-select').addEventListener('change', (e) => {
-            this.currentBiome = biomeTypes[e.target.value];
-            document.getElementById('current-biome').textContent = this.currentBiome.name;
-            this.updateSkybox();
-            this.updateLighting();
-            this.clearAllChunks();
-            this.loadInitialChunks();
-        });
+        const biomeSelect = document.getElementById('biome-select');
+        if (biomeSelect) {
+            biomeSelect.addEventListener('change', (e) => {
+                this.currentBiome = biomeTypes[e.target.value];
+                const biomeName = document.getElementById('current-biome');
+                if (biomeName) {
+                    biomeName.textContent = this.currentBiome.name;
+                }
+                this.updateSkybox();
+                this.updateLighting();
+                this.clearAllChunks();
+                this.loadInitialChunks();
+            });
+        }
     }
     
     setupControls() {
@@ -154,24 +177,24 @@ class TerrainGenerator {
         }, 10000);
     }
     
-    updateSkybox() {
-        // Set the scene background and fog color based on biome
-        const skyColor = new THREE.Color(this.currentBiome.skyColor || 0x87ceeb);
-        this.scene.background = skyColor;
-        this.scene.fog.color = skyColor;
-        this.scene.fog.density = this.currentBiome.fogDensity || 0.002;
-    }
-    
     updateLighting() {
+        if (!this.currentBiome) return; // Guard clause
+        
         // Update lighting based on biome
-        this.ambientLight.intensity = this.currentBiome.ambientIntensity || 0.6;
-        this.ambientLight.color.set(this.currentBiome.ambientColor || 0xffffff);
+        if (this.ambientLight) {
+            this.ambientLight.intensity = this.currentBiome.ambientIntensity || 0.6;
+            this.ambientLight.color.set(this.currentBiome.ambientColor || 0xffffff);
+        }
         
-        this.directionalLight.intensity = this.currentBiome.sunIntensity || 0.8;
-        this.directionalLight.color.set(this.currentBiome.sunColor || 0xffffff);
+        if (this.directionalLight) {
+            this.directionalLight.intensity = this.currentBiome.sunIntensity || 0.8;
+            this.directionalLight.color.set(this.currentBiome.sunColor || 0xffffff);
+        }
         
-        this.hemisphereLight.skyColor.set(this.currentBiome.skyColor || 0x87ceeb);
-        this.hemisphereLight.groundColor.set(this.currentBiome.baseColor);
+        if (this.hemisphereLight) {
+            this.hemisphereLight.skyColor.set(this.currentBiome.skyColor || 0x87ceeb);
+            this.hemisphereLight.groundColor.set(this.currentBiome.baseColor);
+        }
     }
     
     clearAllChunks() {
@@ -969,5 +992,14 @@ class TerrainGenerator {
 
 // Initialize the terrain generator when the document is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new TerrainGenerator();
+    try {
+        new TerrainGenerator();
+    } catch (error) {
+        console.error("Error initializing terrain generator:", error);
+        // Display a user-friendly error message
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = "position:fixed; top:0; left:0; width:100%; background:rgba(200,0,0,0.8); color:white; padding:20px; text-align:center; z-index:9999;";
+        errorDiv.innerHTML = `<h3>Error loading terrain generator</h3><p>${error.message}</p>`;
+        document.body.appendChild(errorDiv);
+    }
 });
