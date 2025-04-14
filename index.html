@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terrain Generation - Inspired by Haste Broken Worlds</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+                "simplex-noise": "https://cdn.jsdelivr.net/npm/simplex-noise@4.0.1/dist/esm/simplex-noise.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="terrain-container"></div>
+    
+    <div class="hud">
+        <div class="biome-indicator">
+            <h3>Current Biome: <span id="current-biome">Grassland</span></h3>
+        </div>
+        <div class="controls">
+            <button id="toggle-generation">Pause Generation</button>
+            <select id="biome-select">
+                <option value="grassland">Grassland</option>
+                <option value="desert">Desert</option>
+                <option value="tundra">Tundra</option>
+                <option value="forest">Forest</option>
+            </select>
+        </div>
+        <div class="info-panel">
+            <h2>Terrain Generation</h2>
+            <div class="stat">
+                <label>Chunks Loaded:</label>
+                <span id="chunks-loaded">0</span>
+            </div>
+            <div class="stat">
+                <label>Height Range:</label>
+                <span id="height-range">0 - 0</span>
+            </div>
+            <div class="feature-highlight" id="feature-highlight">
+                <h4>Feature Detected:</h4>
+                <p>None</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="credits">
+        <p>This visualization is inspired by the procedural terrain generation in <strong>Haste Broken Worlds</strong>.</p>
+        <p>All credit for the original game concept and terrain generation approaches goes to the creators of Haste Broken Worlds.</p>
+    </div>
+    
+    <script type="module" src="terrain-generator.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
